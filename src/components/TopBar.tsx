@@ -1,6 +1,6 @@
 import { Bell, Moon, Search, Sun, User } from "lucide-react";
 import { Input } from "./ui/input";
-import { useTheme } from "next-themes";
+import { useTheme } from "./theme-provider";
 import { Button } from "./ui/button";
 import {
   Tooltip,
@@ -19,7 +19,7 @@ export const TopBar = () => {
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Pesquisar..."
-            className="pl-8 bg-accent/50 border-none focus:bg-accent/80 transition-colors"
+            className="pl-8 bg-accent focus:bg-accent/90 transition-colors"
           />
         </div>
       </div>
@@ -35,7 +35,7 @@ export const TopBar = () => {
               >
                 <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
                 <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                <span className="sr-only">Toggle theme</span>
+                <span className="sr-only">Alternar tema</span>
               </Button>
             </TooltipTrigger>
             <TooltipContent>
