@@ -9,7 +9,7 @@ export const TopBar = () => {
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Pesquisar..."
-            className="pl-8 bg-muted/30 border-none"
+            className="pl-8 bg-blue-50/50 border-none focus:bg-blue-100/50 transition-colors"
           />
         </div>
       </div>

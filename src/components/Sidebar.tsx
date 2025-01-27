@@ -1,4 +1,4 @@
-import { LayoutDashboard, HeadphonesIcon, Repeat2, BarChart3, Menu } from "lucide-react";
+import { LayoutDashboard, HeadphonesIcon, Repeat2, BarChart3, Menu, Target, FileText, PieChart, TrendingUp, Users, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -20,15 +20,52 @@ const menuItems = [
     path: "/habitualidade",
   },
   {
+    title: "Clube de Tiro",
+    icon: Target,
+    path: "/clube-tiro",
+  },
+  {
     title: "Relatórios",
     icon: BarChart3,
     path: "/relatorios",
+    subItems: [
+      {
+        title: "Desempenho",
+        icon: Activity,
+        path: "/relatorios/desempenho",
+      },
+      {
+        title: "Financeiro",
+        icon: TrendingUp,
+        path: "/relatorios/financeiro",
+      },
+      {
+        title: "Membros",
+        icon: Users,
+        path: "/relatorios/membros",
+      },
+      {
+        title: "Estatísticas",
+        icon: PieChart,
+        path: "/relatorios/estatisticas",
+      },
+      {
+        title: "Documentos",
+        icon: FileText,
+        path: "/relatorios/documentos",
+      },
+    ],
   },
 ];
 
 export const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
   const location = useLocation();
+
+  const toggleSubmenu = (title: string) => {
+    setExpandedMenu(expandedMenu === title ? null : title);
+  };
 
   return (
     <div
@@ -37,28 +74,56 @@ export const Sidebar = () => {
         collapsed ? "w-16" : "w-64"
       )}
     >
-      <div className="h-16 border-b flex items-center justify-between px-4">
-        {!collapsed && <span className="font-semibold">Menu</span>}
+      <div className="h-16 border-b border-sidebar-border flex items-center justify-between px-4">
+        {!collapsed && <span className="font-semibold text-sidebar-foreground">Menu</span>}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-2 hover:bg-muted/30 rounded-full"
+          className="p-2 hover:bg-sidebar-accent rounded-full text-sidebar-foreground"
         >
           <Menu className="h-5 w-5" />
         </button>
       </div>
       <nav className="flex-1 p-2">
         {menuItems.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            className={cn(
-              "flex items-center gap-2 px-3 py-2 rounded-lg mb-1 hover:bg-muted/30 transition-colors",
-              location.pathname === item.path && "bg-primary/10 text-primary"
+          <div key={item.path}>
+            <Link
+              to={item.path}
+              className={cn(
+                "flex items-center gap-2 px-3 py-2 rounded-lg mb-1 hover:bg-sidebar-accent transition-colors text-sidebar-foreground",
+                location.pathname === item.path && "bg-sidebar-accent"
+              )}
+              onClick={() => item.subItems && toggleSubmenu(item.title)}
+            >
+              <item.icon className="h-5 w-5" />
+              {!collapsed && (
+                <>
+                  <span>{item.title}</span>
+                  {item.subItems && (
+                    <span className="ml-auto">
+                      {expandedMenu === item.title ? "−" : "+"}
+                    </span>
+                  )}
+                </>
+              )}
+            </Link>
+            {!collapsed && item.subItems && expandedMenu === item.title && (
+              <div className="ml-6 space-y-1">
+                {item.subItems.map((subItem) => (
+                  <Link
+                    key={subItem.path}
+                    to={subItem.path}
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-sidebar-accent transition-colors text-sidebar-foreground",
+                      location.pathname === subItem.path && "bg-sidebar-accent"
+                    )}
+                  >
+                    <subItem.icon className="h-4 w-4" />
+                    <span>{subItem.title}</span>
+                  </Link>
+                ))}
+              </div>
             )}
-          >
-            <item.icon className="h-5 w-5" />
-            {!collapsed && <span>{item.title}</span>}
-          </Link>
+          </div>
         ))}
       </nav>
     </div>
