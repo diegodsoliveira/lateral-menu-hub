@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ThemeProvider } from "@/components/theme-provider";
 import { DashboardLayout } from "./layouts/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
 import CAC from "./pages/CAC";
@@ -15,23 +16,25 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route element={<DashboardLayout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/cac" element={<CAC />} />
-            <Route path="/habitualidade" element={<Habitualidade />} />
-            <Route path="/clube-tiro" element={<ClubeTiro />} />
-            <Route path="/relatorios" element={<Relatorios />} />
-            <Route path="/relatorios/:subpage" element={<Relatorios />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route element={<DashboardLayout />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/cac" element={<CAC />} />
+              <Route path="/habitualidade" element={<Habitualidade />} />
+              <Route path="/clube-tiro" element={<ClubeTiro />} />
+              <Route path="/relatorios" element={<Relatorios />} />
+              <Route path="/relatorios/:subpage" element={<Relatorios />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
