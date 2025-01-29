@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ModeToggle } from "@/components/mode-toggle";
+import { ModeToggle } from "./mode-toggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
