@@ -5,10 +5,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Table,
   TableBody,
@@ -18,9 +21,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Eye, Check, X } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 const Habitualidade = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [viewOpen, setViewOpen] = useState(false);
+  const [approveOpen, setApproveOpen] = useState(false);
+  const [rejectOpen, setRejectOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [rejectReason, setRejectReason] = useState("");
 
   // Mock data for demonstration
   const habitualidades = [
@@ -41,6 +51,31 @@ const Habitualidade = () => {
       foto: "https://placeholder.com/300x200",
     },
   ];
+
+  const handleApprove = () => {
+    toast({
+      title: "Habitualidade aprovada",
+      description: "A habitualidade foi aprovada com sucesso.",
+    });
+    setApproveOpen(false);
+  };
+
+  const handleReject = () => {
+    if (!rejectReason) {
+      toast({
+        title: "Erro",
+        description: "É necessário informar uma justificativa.",
+        variant: "destructive",
+      });
+      return;
+    }
+    toast({
+      title: "Habitualidade rejeitada",
+      description: "A habitualidade foi rejeitada com sucesso.",
+    });
+    setRejectOpen(false);
+    setRejectReason("");
+  };
 
   return (
     <div className="container mx-auto py-6">
@@ -82,6 +117,7 @@ const Habitualidade = () => {
             <TableHead>Arma</TableHead>
             <TableHead>Tiros</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -93,10 +129,113 @@ const Habitualidade = () => {
               <TableCell>
                 <Badge variant="secondary">{hab.status}</Badge>
               </TableCell>
+              <TableCell>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      setSelectedItem(hab);
+                      setViewOpen(true);
+                    }}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      setSelectedItem(hab);
+                      setApproveOpen(true);
+                    }}
+                  >
+                    <Check className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      setSelectedItem(hab);
+                      setRejectOpen(true);
+                    }}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+
+      {/* View Modal */}
+      <Dialog open={viewOpen} onOpenChange={setViewOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Visualizar Habitualidade</DialogTitle>
+          </DialogHeader>
+          {selectedItem && (
+            <div className="grid gap-4">
+              <img
+                src={selectedItem.foto}
+                alt="Foto da habitualidade"
+                className="w-full h-48 object-cover rounded-lg"
+              />
+              <div>
+                <p><strong>Data:</strong> {new Date(selectedItem.data).toLocaleDateString()}</p>
+                <p><strong>Arma:</strong> {selectedItem.arma}</p>
+                <p><strong>Tiros:</strong> {selectedItem.tiros}</p>
+                <p><strong>Status:</strong> {selectedItem.status}</p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Approve Modal */}
+      <Dialog open={approveOpen} onOpenChange={setApproveOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Aprovar Habitualidade</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja aprovar esta habitualidade?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setApproveOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleApprove}>Aprovar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reject Modal */}
+      <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rejeitar Habitualidade</DialogTitle>
+            <DialogDescription>
+              Por favor, informe o motivo da rejeição.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <Textarea
+              placeholder="Motivo da rejeição"
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRejectOpen(false)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={handleReject}>
+              Rejeitar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
