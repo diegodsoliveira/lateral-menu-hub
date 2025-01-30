@@ -21,43 +21,44 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Check, X } from "lucide-react";
+import { Eye, Check, X, Plus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+
+// Mock data for demonstration
+const habitualidades = [
+  {
+    id: 1,
+    data: "2024-01-28",
+    arma: "Pistola Taurus G3C",
+    tiros: 50,
+    status: "Pendente",
+    foto: "https://placeholder.com/300x200",
+    cacNome: "João Silva",
+  },
+  {
+    id: 2,
+    data: "2024-01-27",
+    arma: "Revólver Taurus 838",
+    tiros: 30,
+    status: "Pendente",
+    foto: "https://placeholder.com/300x200",
+    cacNome: "Maria Santos",
+  },
+];
 
 const Habitualidade = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [viewOpen, setViewOpen] = useState(false);
-  const [approveOpen, setApproveOpen] = useState(false);
   const [rejectOpen, setRejectOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [rejectReason, setRejectReason] = useState("");
-
-  // Mock data for demonstration
-  const habitualidades = [
-    {
-      id: 1,
-      data: "2024-01-28",
-      arma: "Pistola Taurus G3C",
-      tiros: 50,
-      status: "Pendente",
-      foto: "https://placeholder.com/300x200",
-    },
-    {
-      id: 2,
-      data: "2024-01-27",
-      arma: "Revólver Taurus 838",
-      tiros: 30,
-      status: "Pendente",
-      foto: "https://placeholder.com/300x200",
-    },
-  ];
 
   const handleApprove = () => {
     toast({
       title: "Habitualidade aprovada",
       description: "A habitualidade foi aprovada com sucesso.",
     });
-    setApproveOpen(false);
+    setViewOpen(false);
   };
 
   const handleReject = () => {
@@ -83,7 +84,10 @@ const Habitualidade = () => {
         <h1 className="text-2xl font-semibold">Habitualidade</h1>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <Button>Nova Habitualidade</Button>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Nova Habitualidade
+            </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
@@ -114,6 +118,7 @@ const Habitualidade = () => {
         <TableHeader>
           <TableRow>
             <TableHead>Data</TableHead>
+            <TableHead>CAC</TableHead>
             <TableHead>Arma</TableHead>
             <TableHead>Tiros</TableHead>
             <TableHead>Status</TableHead>
@@ -124,6 +129,7 @@ const Habitualidade = () => {
           {habitualidades.map((hab) => (
             <TableRow key={hab.id}>
               <TableCell>{new Date(hab.data).toLocaleDateString()}</TableCell>
+              <TableCell>{hab.cacNome}</TableCell>
               <TableCell>{hab.arma}</TableCell>
               <TableCell>{hab.tiros}</TableCell>
               <TableCell>
@@ -141,26 +147,6 @@ const Habitualidade = () => {
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      setSelectedItem(hab);
-                      setApproveOpen(true);
-                    }}
-                  >
-                    <Check className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      setSelectedItem(hab);
-                      setRejectOpen(true);
-                    }}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
                 </div>
               </TableCell>
             </TableRow>
@@ -168,9 +154,9 @@ const Habitualidade = () => {
         </TableBody>
       </Table>
 
-      {/* View Modal */}
+      {/* View Modal with Approve/Reject options */}
       <Dialog open={viewOpen} onOpenChange={setViewOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>Visualizar Habitualidade</DialogTitle>
           </DialogHeader>
@@ -181,32 +167,38 @@ const Habitualidade = () => {
                 alt="Foto da habitualidade"
                 className="w-full h-48 object-cover rounded-lg"
               />
-              <div>
-                <p><strong>Data:</strong> {new Date(selectedItem.data).toLocaleDateString()}</p>
-                <p><strong>Arma:</strong> {selectedItem.arma}</p>
-                <p><strong>Tiros:</strong> {selectedItem.tiros}</p>
-                <p><strong>Status:</strong> {selectedItem.status}</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>CAC</Label>
+                  <p className="mt-1">{selectedItem.cacNome}</p>
+                </div>
+                <div>
+                  <Label>Data</Label>
+                  <p className="mt-1">
+                    {new Date(selectedItem.data).toLocaleDateString()}
+                  </p>
+                </div>
+                <div>
+                  <Label>Arma</Label>
+                  <p className="mt-1">{selectedItem.arma}</p>
+                </div>
+                <div>
+                  <Label>Tiros</Label>
+                  <p className="mt-1">{selectedItem.tiros}</p>
+                </div>
               </div>
+              <DialogFooter className="flex gap-2">
+                <Button variant="outline" onClick={() => setRejectOpen(true)}>
+                  <X className="mr-2 h-4 w-4" />
+                  Rejeitar
+                </Button>
+                <Button onClick={handleApprove}>
+                  <Check className="mr-2 h-4 w-4" />
+                  Aprovar
+                </Button>
+              </DialogFooter>
             </div>
           )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Approve Modal */}
-      <Dialog open={approveOpen} onOpenChange={setApproveOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Aprovar Habitualidade</DialogTitle>
-            <DialogDescription>
-              Tem certeza que deseja aprovar esta habitualidade?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setApproveOpen(false)}>
-              Cancelar
-            </Button>
-            <Button onClick={handleApprove}>Aprovar</Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
 
@@ -231,7 +223,7 @@ const Habitualidade = () => {
               Cancelar
             </Button>
             <Button variant="destructive" onClick={handleReject}>
-              Rejeitar
+              Confirmar Rejeição
             </Button>
           </DialogFooter>
         </DialogContent>
