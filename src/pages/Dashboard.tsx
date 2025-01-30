@@ -8,9 +8,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Eye, Check, X, AlertCircle } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +16,19 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Eye, Check, X, AlertCircle } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -31,13 +41,15 @@ const pendingCacs = [
     cpf: "123.456.789-00",
     dataSubmissao: "2024-01-28",
     status: "Pendente",
-    rg: "12.345.678-9",
-    dataNascimento: "1980-05-15",
-    endereco: "Rua das Flores, 123",
-    cidade: "São Paulo",
-    estado: "SP",
-    telefone: "(11) 98765-4321",
-    email: "joao.silva@email.com",
+    habitualidade: {
+      clube: "Clube de Tiro ABC",
+      arma: "Pistola Taurus G3C",
+      calibre: ".9mm",
+      dataUso: "2024-02-15",
+      duracao: "2 horas",
+      instrutor: "Carlos Santos",
+      observacoes: "Treinamento básico de tiro"
+    }
   },
   {
     id: "CAC002",
@@ -45,27 +57,15 @@ const pendingCacs = [
     cpf: "987.654.321-00",
     dataSubmissao: "2024-01-29",
     status: "Pendente",
-    rg: "98.765.432-1",
-    dataNascimento: "1975-08-22",
-    endereco: "Av. Principal, 456",
-    cidade: "Rio de Janeiro",
-    estado: "RJ",
-    telefone: "(21) 98765-4321",
-    email: "maria.santos@email.com",
-  },
-  {
-    id: "CAC003",
-    nome: "Pedro Oliveira",
-    cpf: "456.789.123-00",
-    dataSubmissao: "2024-01-29",
-    status: "Pendente",
-    rg: "45.678.912-3",
-    dataNascimento: "1990-03-10",
-    endereco: "Rua do Comércio, 789",
-    cidade: "Curitiba",
-    estado: "PR",
-    telefone: "(41) 98765-4321",
-    email: "pedro.oliveira@email.com",
+    habitualidade: {
+      clube: "Clube de Tiro XYZ",
+      arma: "Revólver Taurus 838",
+      calibre: ".38",
+      dataUso: "2024-02-16",
+      duracao: "1.5 horas",
+      instrutor: "Ana Paula",
+      observacoes: "Prática de tiro defensivo"
+    }
   },
 ];
 
@@ -181,49 +181,45 @@ const Dashboard = () => {
         </Table>
       </div>
 
-      {/* Modal de Visualização */}
+      {/* Modal de Visualização de Habitualidade */}
       <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Detalhes do CAC</DialogTitle>
+            <DialogTitle>Detalhes da Habitualidade - {selectedCAC?.nome}</DialogTitle>
             <DialogDescription>
-              Visualize os dados do CAC e tome uma ação
+              Informações sobre a última atividade registrada
             </DialogDescription>
           </DialogHeader>
           {selectedCAC && (
             <div className="grid gap-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="font-medium">Nome</p>
-                  <p>{selectedCAC.nome}</p>
+                  <p className="font-medium">Clube</p>
+                  <p>{selectedCAC.habitualidade.clube}</p>
                 </div>
                 <div>
-                  <p className="font-medium">CPF</p>
-                  <p>{selectedCAC.cpf}</p>
+                  <p className="font-medium">Arma</p>
+                  <p>{selectedCAC.habitualidade.arma}</p>
                 </div>
                 <div>
-                  <p className="font-medium">RG</p>
-                  <p>{selectedCAC.rg}</p>
+                  <p className="font-medium">Calibre</p>
+                  <p>{selectedCAC.habitualidade.calibre}</p>
                 </div>
                 <div>
-                  <p className="font-medium">Data de Nascimento</p>
-                  <p>{new Date(selectedCAC.dataNascimento).toLocaleDateString("pt-BR")}</p>
+                  <p className="font-medium">Data de Uso</p>
+                  <p>{new Date(selectedCAC.habitualidade.dataUso).toLocaleDateString("pt-BR")}</p>
                 </div>
                 <div>
-                  <p className="font-medium">Endereço</p>
-                  <p>{selectedCAC.endereco}</p>
+                  <p className="font-medium">Duração</p>
+                  <p>{selectedCAC.habitualidade.duracao}</p>
                 </div>
                 <div>
-                  <p className="font-medium">Cidade/Estado</p>
-                  <p>{selectedCAC.cidade}/{selectedCAC.estado}</p>
+                  <p className="font-medium">Instrutor</p>
+                  <p>{selectedCAC.habitualidade.instrutor}</p>
                 </div>
-                <div>
-                  <p className="font-medium">Telefone</p>
-                  <p>{selectedCAC.telefone}</p>
-                </div>
-                <div>
-                  <p className="font-medium">Email</p>
-                  <p>{selectedCAC.email}</p>
+                <div className="col-span-2">
+                  <p className="font-medium">Observações</p>
+                  <p>{selectedCAC.habitualidade.observacoes}</p>
                 </div>
               </div>
               <DialogFooter className="flex gap-2 justify-between sm:justify-end">
@@ -252,14 +248,14 @@ const Dashboard = () => {
       </Dialog>
 
       {/* Modal de Rejeição */}
-      <Dialog open={isRejectModalOpen} onOpenChange={setIsRejectModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Rejeitar Cadastro</DialogTitle>
-            <DialogDescription>
+      <AlertDialog open={isRejectModalOpen} onOpenChange={setIsRejectModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Rejeitar Cadastro</AlertDialogTitle>
+            <AlertDialogDescription>
               Por favor, informe o motivo da rejeição.
-            </DialogDescription>
-          </DialogHeader>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
           <div className="grid gap-4 py-4">
             <Textarea
               placeholder="Motivo da rejeição"
@@ -267,16 +263,16 @@ const Dashboard = () => {
               onChange={(e) => setRejectReason(e.target.value)}
             />
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsRejectModalOpen(false)}>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsRejectModalOpen(false)}>
               Cancelar
-            </Button>
-            <Button variant="destructive" onClick={handleReject}>
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleReject}>
               Confirmar Rejeição
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
