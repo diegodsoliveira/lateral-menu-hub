@@ -2,6 +2,9 @@ import { LayoutDashboard, HeadphonesIcon, Repeat2, BarChart3, Menu, Target, File
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useSidebar } from "@/components/ui/sidebar";
 
 const menuItems = [
   {
@@ -62,10 +65,79 @@ export const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
   const location = useLocation();
+  const isMobile = useIsMobile();
+  const { open: isOpen, setOpen } = useSidebar();
 
   const toggleSubmenu = (title: string) => {
     setExpandedMenu(expandedMenu === title ? null : title);
   };
+
+  const renderMenuItems = () => (
+    <nav className="flex-1 p-2">
+      {menuItems.map((item) => (
+        <div key={item.path}>
+          <Link
+            to={item.path}
+            className={cn(
+              "flex items-center gap-2 px-3 py-2 rounded-lg mb-1 hover:bg-sidebar-accent transition-colors text-sidebar-foreground",
+              location.pathname === item.path && "bg-sidebar-accent"
+            )}
+            onClick={() => {
+              if (item.subItems) {
+                toggleSubmenu(item.title);
+              }
+              if (isMobile) {
+                setOpen(false);
+              }
+            }}
+          >
+            <item.icon className="h-5 w-5" />
+            {!collapsed && (
+              <>
+                <span>{item.title}</span>
+                {item.subItems && (
+                  <span className="ml-auto">
+                    {expandedMenu === item.title ? "−" : "+"}
+                  </span>
+                )}
+              </>
+            )}
+          </Link>
+          {!collapsed && item.subItems && expandedMenu === item.title && (
+            <div className="ml-6 space-y-1">
+              {item.subItems.map((subItem) => (
+                <Link
+                  key={subItem.path}
+                  to={subItem.path}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-sidebar-accent transition-colors text-sidebar-foreground",
+                    location.pathname === subItem.path && "bg-sidebar-accent"
+                  )}
+                  onClick={() => isMobile && setOpen(false)}
+                >
+                  <subItem.icon className="h-4 w-4" />
+                  <span>{subItem.title}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </nav>
+  );
+
+  if (isMobile) {
+    return (
+      <Sheet open={isOpen} onOpenChange={setOpen}>
+        <SheetContent side="left" className="w-[240px] p-0">
+          <div className="h-16 border-b border-sidebar-border flex items-center px-4">
+            <span className="font-semibold text-sidebar-foreground">Menu</span>
+          </div>
+          {renderMenuItems()}
+        </SheetContent>
+      </Sheet>
+    );
+  }
 
   return (
     <div
@@ -83,49 +155,7 @@ export const Sidebar = () => {
           <Menu className="h-5 w-5" />
         </button>
       </div>
-      <nav className="flex-1 p-2">
-        {menuItems.map((item) => (
-          <div key={item.path}>
-            <Link
-              to={item.path}
-              className={cn(
-                "flex items-center gap-2 px-3 py-2 rounded-lg mb-1 hover:bg-sidebar-accent transition-colors text-sidebar-foreground",
-                location.pathname === item.path && "bg-sidebar-accent"
-              )}
-              onClick={() => item.subItems && toggleSubmenu(item.title)}
-            >
-              <item.icon className="h-5 w-5" />
-              {!collapsed && (
-                <>
-                  <span>{item.title}</span>
-                  {item.subItems && (
-                    <span className="ml-auto">
-                      {expandedMenu === item.title ? "−" : "+"}
-                    </span>
-                  )}
-                </>
-              )}
-            </Link>
-            {!collapsed && item.subItems && expandedMenu === item.title && (
-              <div className="ml-6 space-y-1">
-                {item.subItems.map((subItem) => (
-                  <Link
-                    key={subItem.path}
-                    to={subItem.path}
-                    className={cn(
-                      "flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-sidebar-accent transition-colors text-sidebar-foreground",
-                      location.pathname === subItem.path && "bg-sidebar-accent"
-                    )}
-                  >
-                    <subItem.icon className="h-4 w-4" />
-                    <span>{subItem.title}</span>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
-      </nav>
+      {renderMenuItems()}
     </div>
   );
 };

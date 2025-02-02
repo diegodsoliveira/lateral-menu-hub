@@ -10,7 +10,7 @@ export const DashboardLayout = () => {
   return (
     <SidebarProvider>
       <div className="flex h-screen bg-background">
-        {!isMobile && <Sidebar />}
+        <Sidebar />
         <div className="flex-1 flex flex-col overflow-hidden">
           <TopBar />
           <main className="flex-1 overflow-auto p-6">
