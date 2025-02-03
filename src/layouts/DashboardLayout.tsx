@@ -9,11 +9,11 @@ export const DashboardLayout = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen bg-background">
+      <div className="min-h-screen flex bg-background">
         <Sidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col min-h-screen">
           <TopBar />
-          <main className="flex-1 overflow-auto p-6">
+          <main className="flex-1 overflow-y-auto p-6">
             <Outlet />
           </main>
         </div>
